@@ -120,6 +120,11 @@ local function clear_compiler_data(event)
 	compilers_text[unit_number] = nil
 end
 
+-- Something is off, so I use this
+local function clear_compiler_event(event)
+	pcall(clear_compiler_data, event)
+end
+
 --#endregion
 
 
@@ -451,10 +456,10 @@ M.events = {
 	[defines.events.on_player_demoted] = function(event)
 		pcall(destroyGUI, game.get_player(event.player_index))
 	end,
-	[defines.events.on_player_mined_entity] = clear_compiler_data,
-	[defines.events.on_entity_died] = clear_compiler_data,
-	[defines.events.on_robot_mined_entity] = clear_compiler_data,
-	[defines.events.script_raised_destroy] = clear_compiler_data,
+	[defines.events.on_player_mined_entity] = clear_compiler_event,
+	[defines.events.on_entity_died] = clear_compiler_event,
+	[defines.events.on_robot_mined_entity] = clear_compiler_event,
+	[defines.events.script_raised_destroy] = clear_compiler_event,
 }
 
 return M
