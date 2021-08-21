@@ -19,12 +19,12 @@ default_gui["lua_program_input"] = {
 		horizontally_stretchable = "on",
 		vertically_stretchable = "on",
 		active_background = {
-			filename = "__m-microcontroller__/graphics/black.png",
+			filename = "__lua-compiler__/graphics/black.png",
 			width = 1,
 			height = 1
 		},
 		default_background = {
-			filename = "__m-microcontroller__/graphics/input.png",
+			filename = "__lua-compiler__/graphics/input.png",
 			width = 1,
 			height = 1
 		}

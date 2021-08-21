@@ -70,5 +70,10 @@ data:extend{
 		filename = GRAPHICS_PATH .. "power-off.png",
 		width = 32,
 		height = 32
-	}
+	}, {
+			type = "font",
+			name = "default-mono",
+			from = "default-mono",
+			size = 16
+	},
 }
