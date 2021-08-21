@@ -42,17 +42,14 @@ local function on_click_on_compiler(player, entity)
 		local text = screenGui.zLua_compiler.list.scroll_pane["zLua_program-input"].text
 		if text ~= '' then
 			compilers_text[unit_number] = text
-			f = load(text)
-			if type(f) == "function" then
-				compiled[unit_number] = f
-			end
+			compiled[unit_number] = load(text)
 			players_opened_compile[player_index] = nil
-			screenGui.zLua_compiler.destroy()
 		else
 			compilers_text[unit_number] = nil
 			compiled[unit_number] = nil
 		end
-		return
+		screenGui.zLua_compiler.destroy()
+		return false
 	end
 
 	local compiler_text = compilers_text[unit_number]
@@ -113,6 +110,8 @@ local function on_click_on_compiler(player, entity)
 	end
 
 	list.add(error_element_data)
+
+	return frame
 end
 
 local function clear_compiler_data(event)
@@ -136,7 +135,7 @@ local function left_mouse_click(event)
 			if entity.rotatable then
 				local f = compiled[entity.unit_number]
 				if f then
-					local is_ok, error = pcall(compiled[entity.unit_number], entity)
+					local is_ok, error = pcall(f, entity)
 					if not is_ok then
 						player.print(error, RED_COLOR)
 					end
@@ -154,8 +153,12 @@ local function left_mouse_click(event)
 			player.print({"command-output.parameters-require-admin"})
 			return
 		end
-		on_click_on_compiler(player, entity)
-		players_opened_compile[player.index] = entity
+		local gui = on_click_on_compiler(player, entity)
+		if gui then
+			players_opened_compile[player.index] = entity
+		else
+			players_opened_compile[player.index] = nil
+		end
 
 		if is_destructible then
 			entity.destructible = false
@@ -218,7 +221,12 @@ local function on_player_rotated_entity(event)
 	local player = game.get_player(event.player_index)
 	if not player.admin then return end
 
-	on_click_on_compiler(player, entity)
+	local gui = on_click_on_compiler(player, entity)
+	if gui then
+		players_opened_compile[player.index] = entity
+	else
+		players_opened_compile[player.index] = nil
+	end
 end
 
 local function on_gui_click(event)
@@ -248,13 +256,12 @@ local function on_gui_click(event)
 		local text = element.parent.parent.scroll_pane["zLua_program-input"].text
 		if text ~= '' then
 			local f = load(text)
+			compiled[unit_number] = f
 			local error_message_GUI = element.parent.parent.error_message
 			if type(f) == "function" then
-				compiled[unit_number] = f
 				element.name = "zLua_run"
 				element.sprite = "microcontroller-play-sprite"
 			else
-				compiled[unit_number] = nil
 				error_message_GUI.caption = {"lua-compiler.cant-compile"}
 			end
 		else
@@ -275,9 +282,7 @@ local function on_gui_click(event)
 			if text ~= '' and text ~= DEFAULT_TEXT then
 				local f = load(text)
 				compilers_text[unit_number] = text
-				if type(f) == "function" then
-					compiled[unit_number] = f
-				end
+				compiled[unit_number] = f
 			else
 				compilers_text[unit_number] = nil
 				compiled[unit_number] = nil
@@ -305,15 +310,14 @@ local function on_gui_click(event)
 		if text ~= '' then
 			local f = load(text)
 			local error_message_GUI = element.parent.parent.error_message
+			compiled[unit_number] = f
 			if type(f) == "function" then
-				compiled[unit_number] = f
 				local refresh_element = element.parent.parent.buttons_row.zLua_refresh
 				if refresh_element then
 					refresh_element.name = "zLua_run"
 					refresh_element.sprite = "microcontroller-play-sprite"
 				end
 			else
-				compiled[unit_number] = nil
 				error_message_GUI.caption = {"lua-compiler.cant-compile"}
 			end
 		else
@@ -331,10 +335,7 @@ end
 
 local function check_all_compilers()
 	for unit_number, text in pairs(compilers_text) do
-		local f = load(text)
-		if type(f) == "function" then
-			compiled[unit_number] = f
-		end
+		compiled[unit_number] = load(text)
 	end
 end
 
@@ -390,10 +391,10 @@ M.add_remote_interface = function()
 			return mod_data
 		end,
 		add_compiler = function(entity, text)
+			local unit_number = entity.unit_number
 			local f = load(text)
+			compiled[unit_number] = f
 			if type(f) == "function" then
-				local unit_number = entity.unit_number
-				compiled[unit_number] = f
 				compilers_text[unit_number] = text
 				entity.destructible = false
 				entity.minable = false
@@ -407,7 +408,12 @@ M.add_remote_interface = function()
 		close_complier_gui = destroyGUI,
 		open_complier_gui = function(player, entity)
 			destroyGUI(player)
-			on_click_on_compiler(player, entity)
+			local gui = on_click_on_compiler(player, entity)
+			if gui then
+				players_opened_compile[player.index] = entity
+			else
+				players_opened_compile[player.index] = nil
+			end
 		end
 	})
 end
