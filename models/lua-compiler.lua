@@ -15,6 +15,7 @@ local players_copyboard = {}
 
 --#region Constants
 local RED_COLOR = {1, 0, 0}
+local DEFAULT_TEXT = "local compiler = ...\ngame.print(compiler.name)"
 --#endregion
 
 
@@ -27,9 +28,9 @@ end
 --#region utils
 
 local function destroyGUI(player)
-	local zLua_compiler_frame = player.gui.screen.zLua_compiler
-	if zLua_compiler_frame then
-		zLua_compiler_frame.destroy()
+	local zLua_compiler_element = player.gui.screen.zLua_compiler
+	if zLua_compiler_element then
+		zLua_compiler_element.destroy()
 	end
 end
 
@@ -59,6 +60,18 @@ local function on_click_on_compiler(player, entity)
 	local frame = screenGui.add{type = "frame", name = "zLua_compiler", caption = {"item-name.zLua-compiler"}}
 	local list = frame.add{type = "table", name = "list", column_count = 1}
 
+
+	local is_have_errors = false
+	-- Data of the lowest element
+	local error_element_data = {type = "label", name = "error_message", caption = "", style = "bold_red_label"}
+	if compiler_text then
+		if compiled[unit_number] == nil then
+			is_have_errors = true
+			error_element_data.caption = {"lua-compiler.cant-compile"}
+		end
+	end
+
+
 	local flow1 = list.add{type = "table", name = "buttons_row", column_count = 5, vertical_centering = true}
 	local content = {type = "sprite-button"}
 	if compiler_text then
@@ -70,15 +83,17 @@ local function on_click_on_compiler(player, entity)
 		content.sprite = "refresh"
 		flow1.add(content)
 	end
+	content.name = "zLua_power-off"
+	content.sprite = "power-off"
 	if entity.rotatable then
-		content.name = "zLua_power-on"
-		content.sprite = "power-on"
-		flow1.add(content)
-	else
-		content.name = "zLua_power-off"
-		content.sprite = "power-off"
-		flow1.add(content)
+		if is_have_errors then
+			entity.rotatable = false
+		else
+			content.name = "zLua_power-on"
+			content.sprite = "power-on"
+		end
 	end
+	flow1.add(content)
 	content.name = "zLua_copy"
 	content.sprite = "microcontroller-copy-sprite"
 	flow1.add(content)
@@ -91,9 +106,13 @@ local function on_click_on_compiler(player, entity)
 
 	local scroll_pane = list.add{type = "scroll-pane", name = "scroll_pane"}
 	local textbox = scroll_pane.add{type = "text-box", name = "zLua_program-input", style = "lua_program_input"}
-	textbox.text = compiler_text or "local compiler = ...\ngame.print(compiler.name)"
+	if entity.destructible then
+		textbox.text = compiler_text or DEFAULT_TEXT
+	else
+		textbox.text = compiler_text or ''
+	end
 
-	list.add{type = "label", name = "error_message", caption = "", style = "bold_red_label"}
+	list.add(error_element_data)
 end
 
 local function clear_compiler_data(event)
@@ -112,7 +131,8 @@ local function left_mouse_click(event)
 	local entity = player.selected
 
 	if entity.name == "zLua-compiler" then
-		if not entity.destructible then
+		local is_destructible = entity.destructible
+		if is_destructible == false then
 			if entity.rotatable then
 				local f = compiled[entity.unit_number]
 				if f then
@@ -124,7 +144,6 @@ local function left_mouse_click(event)
 				end
 			end
 		else
-			entity.destructible = false
 			entity.minable = false
 			entity.rotatable = false
 			entity.operable = false
@@ -137,6 +156,10 @@ local function left_mouse_click(event)
 		end
 		on_click_on_compiler(player, entity)
 		players_opened_compile[player.index] = entity
+
+		if is_destructible then
+			entity.destructible = false
+		end
 	end
 end
 
@@ -184,7 +207,9 @@ local function on_player_left_game(event)
 end
 
 local function on_player_joined_game(event)
-	players_copyboard[event.player_index] = nil
+	local player_index = event.player_index
+	players_copyboard[player_index] = nil
+	destroyGUI(game.get_player(player_index))
 end
 
 local function on_player_rotated_entity(event)
@@ -240,13 +265,14 @@ local function on_gui_click(event)
 		if element.parent.parent.buttons_row.zLua_refresh then
 			local text = element.parent.parent.scroll_pane["zLua_program-input"].text
 			local unit_number = players_opened_compile[player_index].unit_number
-			compilers_text[unit_number] = text
-			if text ~= '' then
+			if text ~= '' and text ~= DEFAULT_TEXT then
 				local f = load(text)
+				compilers_text[unit_number] = text
 				if type(f) == "function" then
 					compiled[unit_number] = f
 				end
 			else
+				compilers_text[unit_number] = nil
 				compiled[unit_number] = nil
 			end
 		end
