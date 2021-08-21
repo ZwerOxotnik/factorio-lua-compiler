@@ -15,7 +15,7 @@ local players_copyboard = {}
 
 --#region Constants
 local RED_COLOR = {1, 0, 0}
-local DEFAULT_TEXT = "local compiler = ...\ngame.print(compiler.name)"
+local DEFAULT_TEXT = "local compiler, player = ...\nplayer.print(compiler.name)"
 --#endregion
 
 
@@ -135,7 +135,7 @@ local function left_mouse_click(event)
 			if entity.rotatable then
 				local f = compiled[entity.unit_number]
 				if f then
-					local is_ok, error = pcall(f, entity)
+					local is_ok, error = pcall(f, entity, player)
 					if not is_ok then
 						player.print(error, RED_COLOR)
 					end
@@ -239,7 +239,7 @@ local function on_gui_click(event)
 	if element_name == "run" then
 		local entity = players_opened_compile[player_index]
 		local error_message_GUI = element.parent.parent.error_message
-		local is_ok, error = pcall(compiled[entity.unit_number], entity)
+		local is_ok, error = pcall(compiled[entity.unit_number], entity, player)
 		if not is_ok then
 			error_message_GUI.caption = error
 			local power_element = element.parent.parent.buttons_row["zLua_power-on"]
