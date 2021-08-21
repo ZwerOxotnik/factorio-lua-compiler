@@ -49,7 +49,7 @@ local function on_click_on_compiler(player, entity)
 			players_opened_compile[player_index] = nil
 			screenGui.zLua_compiler.destroy()
 		else
-			compilers_text[unit_number] = ''
+			compilers_text[unit_number] = nil
 			compiled[unit_number] = nil
 		end
 		return
@@ -258,8 +258,15 @@ local function on_gui_click(event)
 				error_message_GUI.caption = {"lua-compiler.cant-compile"}
 			end
 		else
-			compilers_text[unit_number] = ''
+			compilers_text[unit_number] = nil
 			compiled[unit_number] = nil
+			player.print({"lua-compiler.no-code"})
+			local power_element = element.parent.parent.buttons_row["zLua_power-on"]
+			if power_element then
+				power_element.name = "zLua_power-off"
+				power_element.sprite = "power-off"
+				players_opened_compile[player_index].rotatable = false
+			end
 		end
 	elseif element_name == "close-compiler" then
 		if element.parent.parent.buttons_row.zLua_refresh then
@@ -310,7 +317,7 @@ local function on_gui_click(event)
 				error_message_GUI.caption = {"lua-compiler.cant-compile"}
 			end
 		else
-			compilers_text[unit_number] = ''
+			compilers_text[unit_number] = nil
 			compiled[unit_number] = nil
 		end
 	--TODO: add undo
