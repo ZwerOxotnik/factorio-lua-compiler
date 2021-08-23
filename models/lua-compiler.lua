@@ -385,11 +385,11 @@ end
 M.on_init = update_global_data
 M.on_configuration_changed = update_global_data
 M.on_load = function()
-	local filters = {{filter = "name", name = "zLua-compiler"}}
-	script.set_event_filter(defines.events.on_player_mined_entity, filters)
-	script.set_event_filter(defines.events.on_entity_died, filters)
-	script.set_event_filter(defines.events.on_robot_mined_entity, filters)
-	script.set_event_filter(defines.events.script_raised_destroy, filters)
+	-- local filters = {{filter = "name", name = "zLua-compiler"}}
+	-- script.set_event_filter(defines.events.on_player_mined_entity, filters)
+	-- script.set_event_filter(defines.events.on_entity_died, filters)
+	-- script.set_event_filter(defines.events.on_robot_mined_entity, filters)
+	-- script.set_event_filter(defines.events.script_raised_destroy, filters)
 	link_data()
 	-- check_all_compilers()
 end
