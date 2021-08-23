@@ -3,13 +3,15 @@ local M = {}
 --#region Global data
 local mod_data
 ---@type table <number, LuaEntity>
-local players_opened_compile = {}
----@type table <number, function>
+local players_opened_compile
+
+--type table <number, function>
 -- local compiled = {}
+
 ---@type table <number, string>
 local compilers_text
 ---@type table <number, string>
-local players_copyboard = {}
+local players_copyboard
 --#endregion
 
 
