@@ -362,6 +362,14 @@ local function link_data()
 	players_copyboard = mod_data.players_copyboard
 end
 
+local function set_filters()
+	local filters = {{filter = "name", name = "zLua-compiler"}}
+	script.set_event_filter(defines.events.on_player_mined_entity, filters)
+	script.set_event_filter(defines.events.on_entity_died, filters)
+	script.set_event_filter(defines.events.on_robot_mined_entity, filters)
+	script.set_event_filter(defines.events.script_raised_destroy, filters)
+end
+
 local function update_global_data()
 	global["lua-compiler"] = global["lua-compiler"] or {}
 	mod_data = global["lua-compiler"]
@@ -380,17 +388,15 @@ local function update_global_data()
 			-- compiled[unit_number] = nil
 		end
 	end
+
+	set_filters()
 end
 
 M.on_init = update_global_data
 M.on_configuration_changed = update_global_data
 M.on_load = function()
-	-- local filters = {{filter = "name", name = "zLua-compiler"}}
-	-- script.set_event_filter(defines.events.on_player_mined_entity, filters)
-	-- script.set_event_filter(defines.events.on_entity_died, filters)
-	-- script.set_event_filter(defines.events.on_robot_mined_entity, filters)
-	-- script.set_event_filter(defines.events.script_raised_destroy, filters)
 	link_data()
+	set_filters()
 	-- check_all_compilers()
 end
 M.add_remote_interface = function()
