@@ -245,7 +245,7 @@ local function on_gui_click(event)
 	if element_name == "run" then
 		local entity = players_opened_compile[player_index]
 		local error_message_GUI = element.parent.parent.error_message
-		local f = load(compilers_text[entity.unit_number])
+		local f = load(element.parent.parent.scroll_pane["zLua_program-input"].text)
 		local is_ok, error
 		if f then
 			is_ok, error = pcall(f, entity, player)
