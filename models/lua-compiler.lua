@@ -261,6 +261,7 @@ local function on_gui_click(event)
 		local text = element.parent.parent.scroll_pane["zLua_program-input"].text
 		if text ~= '' then
 			local f = load(text)
+			compilers_text[unit_number] = text
 			compiled[unit_number] = f
 			local error_message_GUI = element.parent.parent.error_message
 			if type(f) == "function" then
