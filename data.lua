@@ -3,6 +3,8 @@ local GRAPHICS_PATH = "__lua-compiler__/graphics/"
 
 local new_combinator = table.deepcopy(data.raw['constant-combinator']['constant-combinator'])
 new_combinator.name = "zLua-compiler"
+new_combinator.icon = "__lua-compiler__/thumbnail.png"
+new_combinator.icon_size = 144
 new_combinator.minable = {
 	hardness = 0.1,
 	mining_time = 0.1,
@@ -23,9 +25,9 @@ data:extend{
 		type = "item",
 		name = new_combinator.name,
 		place_result = new_combinator.name,
-		icon = "__base__/graphics/icons/constant-combinator.png",
-    icon_size = 64, icon_mipmaps = 4,
-		stack_size = 100,
+		icon = "__lua-compiler__/thumbnail.png",
+    icon_size = 144,
+		stack_size = 50,
 		subgroup = "circuit-network",
 		order = 'zz'
 	}, {

@@ -5,7 +5,7 @@ local mod_data
 ---@type table <number, LuaEntity>
 local players_opened_compile = {}
 ---@type table <number, function>
-local compiled = {}
+-- local compiled = {}
 ---@type table <number, string>
 local compilers_text
 ---@type table <number, string>
@@ -42,11 +42,11 @@ local function on_click_on_compiler(player, entity)
 		local text = screenGui.zLua_compiler.list.scroll_pane["zLua_program-input"].text
 		if text ~= '' then
 			compilers_text[unit_number] = text
-			compiled[unit_number] = load(text)
+			-- compiled[unit_number] = load(text)
 			players_opened_compile[player_index] = nil
 		else
 			compilers_text[unit_number] = nil
-			compiled[unit_number] = nil
+			-- compiled[unit_number] = nil
 		end
 		screenGui.zLua_compiler.destroy()
 		return false
@@ -62,7 +62,8 @@ local function on_click_on_compiler(player, entity)
 	-- Data of the lowest element
 	local error_element_data = {type = "label", name = "error_message", caption = "", style = "bold_red_label"}
 	if compiler_text then
-		if compiled[unit_number] == nil then
+		-- if compiled[unit_number] == nil then
+		if load(compiler_text) == nil then
 			is_have_errors = true
 			error_element_data.caption = {"lua-compiler.cant-compile"}
 		end
@@ -115,9 +116,8 @@ local function on_click_on_compiler(player, entity)
 end
 
 local function clear_compiler_data(event)
-	local unit_number = event.entity.unit_number
-	compiled[unit_number] = nil
-	compilers_text[unit_number] = nil
+	-- compiled[unit_number] = nil
+	compilers_text[event.entity.unit_number] = nil
 end
 
 -- Something is off, so I use this
@@ -138,7 +138,8 @@ local function left_mouse_click(event)
 		local is_destructible = entity.destructible
 		if is_destructible == false then
 			if entity.rotatable then
-				local f = compiled[entity.unit_number]
+				-- local f = compiled[entity.unit_number]
+				local f = load(compilers_text[entity.unit_number])
 				if f then
 					local is_ok, error = pcall(f, entity, player)
 					if not is_ok then
@@ -193,7 +194,7 @@ local function on_entity_settings_pasted(event)
 		local sun = source.unit_number
 		local dun = destination.unit_number
 		compilers_text[dun] = compilers_text[sun]
-		compiled[dun] = compiled[sun]
+		-- compiled[dun] = compiled[sun]
 	end
 end
 
@@ -244,7 +245,15 @@ local function on_gui_click(event)
 	if element_name == "run" then
 		local entity = players_opened_compile[player_index]
 		local error_message_GUI = element.parent.parent.error_message
-		local is_ok, error = pcall(compiled[entity.unit_number], entity, player)
+		local f = load(compilers_text[entity.unit_number])
+		local is_ok, error
+		if f then
+			is_ok, error = pcall(f, entity, player)
+		else
+			is_ok = false
+			error = {"lua-compiler.cant-compile"}
+		end
+		-- local is_ok, error = pcall(compiled[entity.unit_number], entity, player)
 		if not is_ok then
 			error_message_GUI.caption = error
 			local power_element = element.parent.parent.buttons_row["zLua_power-on"]
@@ -261,7 +270,7 @@ local function on_gui_click(event)
 		local text = element.parent.parent.scroll_pane["zLua_program-input"].text
 		if text ~= '' then
 			local f = load(text)
-			compiled[unit_number] = f
+			-- compiled[unit_number] = f
 			local error_message_GUI = element.parent.parent.error_message
 			if type(f) == "function" then
 				element.name = "zLua_run"
@@ -271,7 +280,7 @@ local function on_gui_click(event)
 			end
 		else
 			compilers_text[unit_number] = nil
-			compiled[unit_number] = nil
+			-- compiled[unit_number] = nil
 			player.print({"lua-compiler.no-code"})
 			local power_element = element.parent.parent.buttons_row["zLua_power-on"]
 			if power_element then
@@ -285,12 +294,12 @@ local function on_gui_click(event)
 			local text = element.parent.parent.scroll_pane["zLua_program-input"].text
 			local unit_number = players_opened_compile[player_index].unit_number
 			if text ~= '' and text ~= DEFAULT_TEXT then
-				local f = load(text)
+				-- local f = load(text)
 				compilers_text[unit_number] = text
-				compiled[unit_number] = f
+				-- compiled[unit_number] = f
 			else
 				compilers_text[unit_number] = nil
-				compiled[unit_number] = nil
+				-- compiled[unit_number] = nil
 			end
 		end
 		player.gui.screen.zLua_compiler.destroy()
@@ -315,7 +324,7 @@ local function on_gui_click(event)
 		if text ~= '' then
 			local f = load(text)
 			local error_message_GUI = element.parent.parent.error_message
-			compiled[unit_number] = f
+			-- compiled[unit_number] = f
 			if type(f) == "function" then
 				local refresh_element = element.parent.parent.buttons_row.zLua_refresh
 				if refresh_element then
@@ -327,7 +336,7 @@ local function on_gui_click(event)
 			end
 		else
 			compilers_text[unit_number] = nil
-			compiled[unit_number] = nil
+			-- compiled[unit_number] = nil
 		end
 	--TODO: add undo
 	end
@@ -338,11 +347,11 @@ end
 
 --#region Pre-game stage
 
-local function check_all_compilers()
-	for unit_number, text in pairs(compilers_text) do
-		compiled[unit_number] = load(text)
-	end
-end
+-- local function check_all_compilers()
+-- 	for unit_number, text in pairs(compilers_text) do
+-- 		compiled[unit_number] = load(text)
+-- 	end
+-- end
 
 local function link_data()
 	mod_data = global["lua-compiler"]
@@ -366,7 +375,7 @@ local function update_global_data()
 	for unit_number, entity in pairs(compilers_text) do
 		if not (entity and entity.valid) then
 			compilers_text[unit_number] = nil
-			compiled[unit_number] = nil
+			-- compiled[unit_number] = nil
 		end
 	end
 end
@@ -380,7 +389,7 @@ M.on_load = function()
 	script.set_event_filter(defines.events.on_robot_mined_entity, filters)
 	script.set_event_filter(defines.events.script_raised_destroy, filters)
 	link_data()
-	check_all_compilers()
+	-- check_all_compilers()
 end
 M.add_remote_interface = function()
 	-- https://lua-api.factorio.com/latest/LuaRemote.html
@@ -389,8 +398,13 @@ M.add_remote_interface = function()
 		get_source = function()
 			return script.mod_name
 		end,
-		execute_compiler = function(entity)
-			compiled[entity.unit_number](entity)
+		execute_compiler = function(entity, player)
+			local unit_number = entity.unit_number
+			local f = load(compilers_text[unit_number])
+			if f ~= nil then
+				f(entity, player)
+			end
+			-- compiled[unit_number](entity)
 		end,
 		get_mod_data = function()
 			return mod_data
@@ -398,7 +412,7 @@ M.add_remote_interface = function()
 		add_compiler = function(entity, text)
 			local unit_number = entity.unit_number
 			local f = load(text)
-			compiled[unit_number] = f
+			-- compiled[unit_number] = f
 			if type(f) == "function" then
 				compilers_text[unit_number] = text
 				entity.destructible = false
