@@ -69,7 +69,7 @@ local function on_click_on_compiler(player, entity)
 	end
 
 
-	local flow1 = list.add{type = "table", name = "buttons_row", column_count = 5, vertical_centering = true}
+	local flow1 = list.add{type = "table", name = "buttons_row", column_count = 8}
 	local content = {type = "sprite-button"}
 	if compiler_text then
 		content.name = "zLua_run"
@@ -118,11 +118,6 @@ local function clear_compiler_data(event)
 	local unit_number = event.entity.unit_number
 	compiled[unit_number] = nil
 	compilers_text[unit_number] = nil
-end
-
--- Something is off, so I use this
-local function clear_compiler_event(event)
-	pcall(clear_compiler_data, event)
 end
 
 --#endregion
@@ -282,9 +277,12 @@ local function on_gui_click(event)
 			end
 		end
 	elseif element_name == "close-compiler" then
-		if element.parent.parent.buttons_row.zLua_refresh then
-			local text = element.parent.parent.scroll_pane["zLua_program-input"].text
-			local unit_number = players_opened_compile[player_index].unit_number
+		local entity = players_opened_compile[player_index]
+		local zLua_compiler = player.gui.screen.zLua_compiler
+		local list_GUI = zLua_compiler.list
+		if entity and entity.valid and list_GUI.buttons_row.zLua_refresh then
+			local text = list_GUI.scroll_pane["zLua_program-input"].text
+			local unit_number = entity.unit_number
 			if text ~= '' and text ~= DEFAULT_TEXT then
 				local f = load(text)
 				compilers_text[unit_number] = text
@@ -294,7 +292,7 @@ local function on_gui_click(event)
 				compiled[unit_number] = nil
 			end
 		end
-		player.gui.screen.zLua_compiler.destroy()
+		zLua_compiler.destroy()
 	elseif element_name == "power-on" then
 		local entity = players_opened_compile[player_index]
 		element.name = "zLua_power-off"
@@ -469,10 +467,10 @@ M.events = {
 	[defines.events.on_player_demoted] = function(event)
 		pcall(destroyGUI, game.get_player(event.player_index))
 	end,
-	[defines.events.on_player_mined_entity] = clear_compiler_event,
-	[defines.events.on_entity_died] = clear_compiler_event,
-	[defines.events.on_robot_mined_entity] = clear_compiler_event,
-	[defines.events.script_raised_destroy] = clear_compiler_event,
+	[defines.events.on_player_mined_entity] = clear_compiler_data,
+	[defines.events.on_entity_died] = clear_compiler_data,
+	[defines.events.on_robot_mined_entity] = clear_compiler_data,
+	[defines.events.script_raised_destroy] = clear_compiler_data,
 }
 
 return M

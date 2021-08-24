@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.7
+Date: 23. 08. 2021
+  Changes:
+    - Removed some unnecessary code
+  Bugfixes:
+    - Fixed closing of GUI when the compiler is destroyed by any method
+---------------------------------------------------------------------------------------------------
 Version: 0.9.6
 Date: 23. 08. 2021
   Changes:
