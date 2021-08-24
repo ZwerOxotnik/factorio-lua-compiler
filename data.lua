@@ -35,43 +35,64 @@ data:extend{
 		name = "microcontroller-play-sprite",
 		filename = GRAPHICS_PATH .. "play.png",
 		width = 32,
-		height = 32
+		height = 32,
+		flags = {
+			"gui-icon"
+		}
 	}, {
 		type = "sprite",
 		name = "microcontroller-exit-sprite",
 		filename = GRAPHICS_PATH .. "cancel.png",
 		width = 32,
-		height = 32
+		height = 32,
+		flags = {
+			"gui-icon"
+		}
 	}, {
 		type = "sprite",
 		name = "microcontroller-copy-sprite",
 		filename = GRAPHICS_PATH .. "copy.png",
 		width = 32,
-		height = 32
+		height = 32,
+		flags = {
+			"gui-icon"
+		}
 	}, {
 		type = "sprite",
 		name = "microcontroller-paste-sprite",
 		filename = GRAPHICS_PATH .. "draft.png",
 		width = 32,
-		height = 32
+		height = 32,
+		flags = {
+			"gui-icon"
+		}
 	}, {
 		type = "sprite",
 		name = "refresh",
 		filename = GRAPHICS_PATH .. "refresh.png",
 		width = 32,
-		height = 32
+		height = 32,
+		flags = {
+			"gui-icon"
+		}
 	}, {
 		type = "sprite",
 		name = "power-on",
 		filename = GRAPHICS_PATH .. "power-on.png",
 		width = 32,
-		height = 32
+		height = 32,
+		flags = {
+			"gui-icon"
+		}
 	}, {
 		type = "sprite",
 		name = "power-off",
 		filename = GRAPHICS_PATH .. "power-off.png",
 		width = 32,
-		height = 32
+		height = 32,
+		flags = {
+			"gui-icon"
+		}
 	}, {
 			type = "font",
 			name = "default-mono",
