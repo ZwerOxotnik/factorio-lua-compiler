@@ -1,11 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.10
+Date: 27. 08. 2021
+  Changes:
+    - Removed unnecessary data
+---------------------------------------------------------------------------------------------------
 Version: 0.9.9
 Date: 27. 08. 2021
   Changes:
     - Improved GUI
     - Small improvements
   Bugfixes:
-    - Fixed desync when an admin press paste button
+    - Fixed desync when an admin press the paste button
 ---------------------------------------------------------------------------------------------------
 Version: 0.9.8
 Date: 24. 08. 2021

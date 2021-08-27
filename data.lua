@@ -41,15 +41,6 @@ data:extend{
 		}
 	}, {
 		type = "sprite",
-		name = "microcontroller-exit-sprite",
-		filename = GRAPHICS_PATH .. "cancel.png",
-		width = 32,
-		height = 32,
-		flags = {
-			"gui-icon"
-		}
-	}, {
-		type = "sprite",
 		name = "microcontroller-copy-sprite",
 		filename = GRAPHICS_PATH .. "copy.png",
 		width = 32,
