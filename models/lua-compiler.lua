@@ -55,10 +55,7 @@ local function on_click_on_compiler(player, entity)
 	local compiler_text = compilers_text[unit_number]
 
 	local main_frame = screenGui.add{type = "frame", name = "zLua_compiler", direction = "vertical"}
-	local flow = main_frame.add{
-		type = "flow",
-		style = "flib_titlebar_flow"
-	}
+	local flow = main_frame.add{type = "flow"}
 	flow.add{
 		type = "label",
 		style = "frame_title",
