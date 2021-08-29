@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.12
+Date: 29. 08. 2021
+  Changes:
+    - Added Brazilian Portuguese translation (thanks to @BM123499 (Bruno Melo) on crowdin)
+  Notes:
+    - Translations: https://crowdin.com/project/factorio-mods-localization (thank you for contributions, I really appreciate it)
+---------------------------------------------------------------------------------------------------
 Version: 0.9.11
 Date: 27. 08. 2021
   Bugfixes:
