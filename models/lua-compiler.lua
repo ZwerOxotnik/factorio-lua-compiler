@@ -14,6 +14,7 @@ local players_copyboard
 
 
 --#region Constants
+local find = string.find
 local RED_COLOR = {1, 0, 0}
 local DEFAULT_TEXT = "local compiler, player = ...\nplayer.print(compiler.name)"
 --#endregion
@@ -27,10 +28,10 @@ end
 
 --#region utils
 
-local function destroyGUI(player)
-	local zLua_compiler_element = player.gui.screen.zLua_compiler
-	if zLua_compiler_element then
-		zLua_compiler_element.destroy()
+local function destroy_GUI(player)
+	local element = player.gui.screen.zLua_compiler
+	if element then
+		element.destroy()
 	end
 end
 
@@ -215,7 +216,7 @@ end
 local function on_player_far_from_compiler(event)
 	local player_index = event.player_index
 	local player = game.get_player(player_index)
-	destroyGUI(player)
+	destroy_GUI(player)
 	players_opened_compile[player_index] = nil
 end
 
@@ -228,7 +229,7 @@ end
 local function on_player_joined_game(event)
 	local player_index = event.player_index
 	players_copyboard[player_index] = nil
-	destroyGUI(game.get_player(player_index))
+	destroy_GUI(game.get_player(player_index))
 end
 
 local function on_player_rotated_entity(event)
@@ -245,30 +246,75 @@ local function on_player_rotated_entity(event)
 	end
 end
 
-local function on_gui_click(event)
-	local player_index = event.player_index
-	local player = game.get_player(player_index)
-	local element = event.element
-	local element_name, count = (element.name):gsub("zLua_", '')
-	if count == 0 then return end
-
-	if element_name == "run" then
-		local entity = players_opened_compile[player_index]
-		local error_message_GUI = element.parent.parent.error_message
-		local is_ok, error = pcall(compiled[entity.unit_number], entity, player)
-		if not is_ok then
-			error_message_GUI.caption = error
-			local power_element = element.parent.buttons_row["zLua_power-on"]
-			if power_element then
-				power_element.name = "zLua_power-off"
-				power_element.sprite = "power-off"
-				entity.rotatable = false
+local GUIS = {
+	["zLua_paste"] = function(element, player)
+		local text = players_copyboard[player.index]
+		if text == nil then return end
+		local parent = element.parent
+		parent.parent.scroll_pane["zLua_program-input"].text = text
+		local unit_number = players_opened_compile[player.index].unit_number
+		if text ~= '' then
+			local f = load(text)
+			local error_message_GUI = parent.parent.error_message
+			compilers_text[unit_number] = text
+			compiled[unit_number] = f
+			if type(f) == "function" then
+				local refresh_element = parent.buttons_row.zLua_refresh
+				if refresh_element then
+					refresh_element.name = "zLua_run"
+					refresh_element.sprite = "microcontroller-play-sprite"
+				end
+			else
+				error_message_GUI.caption = {"lua-compiler.cant-compile"}
+				players_opened_compile[player.index].rotatable = false
+				local power_element = parent.parent.buttons_row["zLua_power-on"]
+				if power_element then
+					power_element.name = "zLua_power-off"
+					power_element.sprite = "power-off"
+				end
 			end
 		else
-			error_message_GUI.caption = ""
+			compilers_text[unit_number] = nil
+			compiled[unit_number] = nil
 		end
-	elseif element_name == "refresh" then
-		local unit_number = players_opened_compile[player_index].unit_number
+		--TODO: add undo, self destruction
+	end,
+	["zLua_copy"] = function(element, player)
+		players_copyboard[player.index] = element.parent.parent.scroll_pane["zLua_program-input"].tex
+	end,
+	["zLua_power-off"] = function(element, player)
+		local entity = players_opened_compile[player.index]
+		element.name = "zLua_power-on"
+		element.sprite = "power-on"
+		entity.rotatable = true
+		player.print({"lua-compiler.rotate-hint"})
+	end,
+	["zLua_power-on"] = function(element, player)
+		local entity = players_opened_compile[player.index]
+		element.name = "zLua_power-off"
+		element.sprite = "power-off"
+		entity.rotatable = false
+	end,
+	["zLua_close-compiler"] = function(element, player)
+		local entity = players_opened_compile[player.index]
+		local zLua_compiler = player.gui.screen.zLua_compiler
+		local buttons_row = zLua_compiler.buttons_row
+		if entity and entity.valid and buttons_row.zLua_refresh then
+			local text = zLua_compiler.scroll_pane["zLua_program-input"].text
+			local unit_number = entity.unit_number
+			if text ~= '' and text ~= DEFAULT_TEXT then
+				local f = load(text)
+				compilers_text[unit_number] = text
+				compiled[unit_number] = f
+			else
+				compilers_text[unit_number] = nil
+				compiled[unit_number] = nil
+			end
+		end
+		zLua_compiler.destroy()
+	end,
+	["zLua_refresh"] = function(element, player)
+		local unit_number = players_opened_compile[player.index].unit_number
 		local parent = element.parent
 		local text = parent.parent.scroll_pane["zLua_program-input"].text
 		if text ~= '' then
@@ -290,71 +336,33 @@ local function on_gui_click(event)
 			if power_element then
 				power_element.name = "zLua_power-off"
 				power_element.sprite = "power-off"
-				players_opened_compile[player_index].rotatable = false
+				players_opened_compile[player.index].rotatable = false
 			end
 		end
-	elseif element_name == "close-compiler" then
-		local entity = players_opened_compile[player_index]
-		local zLua_compiler = player.gui.screen.zLua_compiler
-		local buttons_row = zLua_compiler.buttons_row
-		if entity and entity.valid and buttons_row.zLua_refresh then
-			local text = zLua_compiler.scroll_pane["zLua_program-input"].text
-			local unit_number = entity.unit_number
-			if text ~= '' and text ~= DEFAULT_TEXT then
-				local f = load(text)
-				compilers_text[unit_number] = text
-				compiled[unit_number] = f
-			else
-				compilers_text[unit_number] = nil
-				compiled[unit_number] = nil
-			end
-		end
-		zLua_compiler.destroy()
-	elseif element_name == "power-on" then
-		local entity = players_opened_compile[player_index]
-		element.name = "zLua_power-off"
-		element.sprite = "power-off"
-		entity.rotatable = false
-	elseif element_name == "power-off" then
-		local entity = players_opened_compile[player_index]
-		element.name = "zLua_power-on"
-		element.sprite = "power-on"
-		entity.rotatable = true
-		player.print({"lua-compiler.rotate-hint"})
-	elseif element_name == "copy" then
-		players_copyboard[player_index] = element.parent.parent.scroll_pane["zLua_program-input"].text
-	elseif element_name == "paste" then
-		local text = players_copyboard[player_index]
-		if text == nil then return end
-		local parent = element.parent
-		parent.parent.scroll_pane["zLua_program-input"].text = text
-		local unit_number = players_opened_compile[player_index].unit_number
-		if text ~= '' then
-			local f = load(text)
-			local error_message_GUI = parent.parent.error_message
-			compilers_text[unit_number] = text
-			compiled[unit_number] = f
-			if type(f) == "function" then
-				local refresh_element = parent.buttons_row.zLua_refresh
-				if refresh_element then
-					refresh_element.name = "zLua_run"
-					refresh_element.sprite = "microcontroller-play-sprite"
-				end
-			else
-				error_message_GUI.caption = {"lua-compiler.cant-compile"}
-				players_opened_compile[player_index].rotatable = false
-				local power_element = parent.parent.buttons_row["zLua_power-on"]
-				if power_element then
-					power_element.name = "zLua_power-off"
-					power_element.sprite = "power-off"
-				end
+	end,
+	["zLua_run"] = function(element, player)
+		local entity = players_opened_compile[player.index]
+		local error_message_GUI = element.parent.parent.error_message
+		local is_ok, error = pcall(compiled[entity.unit_number], entity, player)
+		if not is_ok then
+			error_message_GUI.caption = error
+			local power_element = element.parent.buttons_row["zLua_power-on"]
+			if power_element then
+				power_element.name = "zLua_power-off"
+				power_element.sprite = "power-off"
+				entity.rotatable = false
 			end
 		else
-			compilers_text[unit_number] = nil
-			compiled[unit_number] = nil
+			error_message_GUI.caption = ""
 		end
-	--TODO: add undo, self destruction
 	end
+}
+local function on_gui_click(event)
+	local element = event.element
+	if not find(element.name, "^zLua_") then return end
+
+	local f = GUIS[element.name]
+	if f then f(element, game.get_player(event.player_index)) end
 end
 
 --#endregion
@@ -393,7 +401,7 @@ local function update_global_data()
 	link_data()
 
 	for _, player in pairs(game.players) do
-		destroyGUI(player)
+		destroy_GUI(player)
 	end
 	for unit_number, entity in pairs(compilers_text) do
 		if not (entity and entity.valid) then
@@ -454,9 +462,9 @@ M.add_remote_interface = function()
 		get_function = function(entity)
 			return compiled[entity.unit_number]
 		end,
-		close_complier_gui = destroyGUI,
+		close_complier_gui = destroy_GUI,
 		open_complier_gui = function(player, entity)
-			destroyGUI(player)
+			destroy_GUI(player)
 			local gui = on_click_on_compiler(player, entity)
 			if gui then
 				players_opened_compile[player.index] = entity
@@ -498,7 +506,7 @@ M.events = {
 		pcall(on_player_rotated_entity, event)
 	end,
 	[defines.events.on_player_demoted] = function(event)
-		pcall(destroyGUI, game.get_player(event.player_index))
+		pcall(destroy_GUI, game.get_player(event.player_index))
 	end,
 	[defines.events.on_player_mined_entity] = clear_compiler_data,
 	[defines.events.on_entity_died] = clear_compiler_data,
