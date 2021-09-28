@@ -359,8 +359,6 @@ local GUIS = {
 }
 local function on_gui_click(event)
 	local element = event.element
-	if sub(element.name, 1, 5) ~= "zLua_" then return end
-
 	local f = GUIS[element.name]
 	if f then f(element, game.get_player(event.player_index)) end
 end
