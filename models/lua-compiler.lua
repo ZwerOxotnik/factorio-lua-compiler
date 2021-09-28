@@ -14,7 +14,7 @@ local players_copyboard
 
 
 --#region Constants
-local find = string.find
+local sub = string.sub
 local RED_COLOR = {1, 0, 0}
 local DEFAULT_TEXT = "local compiler, player = ...\nplayer.print(compiler.name)"
 --#endregion
@@ -359,7 +359,7 @@ local GUIS = {
 }
 local function on_gui_click(event)
 	local element = event.element
-	if not find(element.name, "^zLua_") then return end
+	if sub(element.name, 1, 5) ~= "zLua_" then return end
 
 	local f = GUIS[element.name]
 	if f then f(element, game.get_player(event.player_index)) end
