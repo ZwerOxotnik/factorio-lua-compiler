@@ -7,7 +7,7 @@
   "contact": "zweroxotnik@gmail.com, Discord:ZwerOxotnik#7117",
   "dependencies": [
     "base",
-		"? gvv",
-		"? zk-lib >= 0.10.0"
-	]
+    "? gvv",
+    "? zk-lib >= 0.10.0"
+  ]
 }
