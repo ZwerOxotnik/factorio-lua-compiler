@@ -20,3 +20,5 @@ else
 	event_handler = require("event_handler")
 end
 event_handler.add_libraries(modules)
+
+if script.active_mods["gvv"] then require("__gvv__.gvv")() end

@@ -1,12 +1,13 @@
 {
   "name": "lua-compiler",
-  "version": "0.9.16",
+  "version": "0.9.17",
   "factorio_version": "1.1",
   "title": "Lua Compiler",
   "author": "ZwerOxotnik",
   "contact": "zweroxotnik@gmail.com, Discord:ZwerOxotnik#7117",
   "dependencies": [
-		"? zk-lib >= 0.10.0",
-		"base"
+    "base",
+		"? gvv",
+		"? zk-lib >= 0.10.0"
 	]
 }

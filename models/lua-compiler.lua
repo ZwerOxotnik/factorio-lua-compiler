@@ -2,19 +2,18 @@ local M = {}
 
 --#region Global data
 local mod_data
----@type table <number, LuaEntity>
+---@type table<integer, LuaEntity>
 local players_opened_compile
----@type table <number, function>
+---@type table<integer, function>
 local compiled = {}
----@type table <number, string>
+---@type table<integer, string>
 local compilers_text
----@type table <number, string>
+---@type table<integer, string>
 local players_copyboard
 --#endregion
 
 
 --#region Constants
-local sub = string.sub
 local RED_COLOR = {1, 0, 0}
 local DEFAULT_TEXT = "local compiler, player = ...\nplayer.print(compiler.name)"
 --#endregion
