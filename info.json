@@ -1,7 +1,7 @@
 {
   "name": "lua-compiler",
-  "version": "0.9.17",
-  "factorio_version": "1.1",
+  "version": "0.10.0",
+  "factorio_version": "2.0",
   "title": "Lua Compiler",
   "author": "ZwerOxotnik",
   "contact": "zweroxotnik@gmail.com, Discord:ZwerOxotnik#7117",

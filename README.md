@@ -83,7 +83,7 @@ Alternatively, join the [Discord group][Discord] and send a message there.
 License
 -------
 
-Copyright (c) 2021 ZwerOxotnik \<zweroxotnik@gmail.com\>
+Copyright (c) 2021, 2024 ZwerOxotnik \<zweroxotnik@gmail.com\>
 
 Use of the source code included here is governed by the Apache License, Version 2.0. See the [LICENSE](/LICENSE) file for details.
 
