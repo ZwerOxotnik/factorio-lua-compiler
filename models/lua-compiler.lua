@@ -160,7 +160,7 @@ function M.left_mouse_click(event)
 				end
 			end
 		else
-			entity.minable = false
+			entity.minable_flag = false
 			entity.rotatable = false
 			entity.operable = false
 		end
@@ -442,7 +442,7 @@ M.add_remote_interface = function()
 			if type(f) == "function" then
 				__compilers_text[unit_number] = text
 				entity.destructible = false
-				entity.minable = false
+				entity.minable_flag = false
 				entity.rotatable = false
 				entity.operable = true
 			end
